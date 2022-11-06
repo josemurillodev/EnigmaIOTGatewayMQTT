@@ -224,7 +224,7 @@ void processRxData (uint8_t* mac, uint8_t* buffer, uint8_t length, uint16_t lost
 	mac2str (addr, mac_str);
 
 	if (control) {
-		processRxControlData (nodeName ? nodeName : mac_str, buffer, length);
+		processRxControlData (mac_str, buffer, length);
 		return;
 	}
 	//char* netName = EnigmaIOTGateway.getNetworkName ();
@@ -263,12 +263,12 @@ void processRxData (uint8_t* mac, uint8_t* buffer, uint8_t length, uint16_t lost
 		}
 	}
 
-	GwOutput.outputDataSend (nodeName ? nodeName : mac_str, payload, pld_size);
-	DEBUG_INFO ("Published data message from %s, length %d: %s, Encoding 0x%02X", nodeName ? nodeName : mac_str, pld_size, payload, payload_type);
+	GwOutput.outputDataSend (mac_str, payload, pld_size);
+	DEBUG_INFO ("Published data message from %s, length %d: %s, Encoding 0x%02X", mac_str, pld_size, payload, payload_type);
 	if (lostMessages > 0) {
 		pld_size = snprintf (payload, PAYLOAD_SIZE, "{\"lostMessages\":%u}", lostMessages);
-		GwOutput.outputDataSend (nodeName ? nodeName : mac_str, payload, pld_size, GwOutput_data_type::lostmessages);
-		DEBUG_INFO ("Published MQTT from %s: %s", nodeName ? nodeName : mac_str, payload);
+		GwOutput.outputDataSend (mac_str, payload, pld_size, GwOutput_data_type::lostmessages);
+		DEBUG_INFO ("Published MQTT from %s: %s", mac_str, payload);
 	}
 #if ENABLE_STATUS_MESSAGES
     pld_size = snprintf (payload, PAYLOAD_SIZE, "{\"rssi\":%d,\"per\":%e,\"lostmessages\":%u,\"totalmessages\":%u,\"packetshour\":%.2f}",
@@ -277,8 +277,8 @@ void processRxData (uint8_t* mac, uint8_t* buffer, uint8_t length, uint16_t lost
 						 EnigmaIOTGateway.getErrorPackets ((uint8_t*)mac),
 						 EnigmaIOTGateway.getTotalPackets ((uint8_t*)mac),
 						 EnigmaIOTGateway.getPacketsHour ((uint8_t*)mac));
-	GwOutput.outputDataSend (nodeName ? nodeName : mac_str, payload, pld_size, GwOutput_data_type::status);
-	DEBUG_INFO ("Published MQTT from %s: %s", nodeName ? nodeName : mac_str, payload);
+	GwOutput.outputDataSend (mac_str, payload, pld_size, GwOutput_data_type::status);
+	DEBUG_INFO ("Published MQTT from %s: %s", mac_str, payload);
 #endif
 }
 
